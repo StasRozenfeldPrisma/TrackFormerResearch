@@ -10,7 +10,7 @@ chardet==3.0.4
 cloudpickle==1.6.0
 colorama==0.4.3
 cycler==0.10.0
-Cython==0.29.20
+# Cython==0.29.20
 decorator==4.4.2
 defusedxml==0.6.0
 docopt==0.6.2
@@ -43,7 +43,7 @@ jupyter-core==4.7.0
 jupyterlab-pygments==0.1.2
 jupyterlab-widgets==1.0.0
 kiwisolver==1.2.0
-lap==0.4.0
+# lap==0.4.0
 lapsolver==1.1.0
 lazy-object-proxy==1.4.3
 MarkupSafe==1.1.1
@@ -60,7 +60,7 @@ nest-asyncio==1.5.1
 networkx==2.4
 ninja==1.10.0.post2
 notebook==6.2.0
-numpy==1.18.5
+# numpy==1.18.5
 opencv-python==4.2.0.34
 packaging==20.4
 pandas==1.0.5

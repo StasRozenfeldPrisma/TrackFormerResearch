@@ -1,1 +1,19 @@
-installationNotes
+REM Windows 10
+REM Using python 3.7 (to support numpy 1.18.5)
+REM cmd -> run as administrator
+
+cd C:\Users\stas.rozenfeld\virtualenvs\p37_trackFormerResearch
+"C:\Program Files\Python37\python.exe" -m venv C:\Users\stas.rozenfeld\virtualenvs\p37_trackFormerResearch
+Scripts\activate
+D:
+cd D:\GIT_ripos\TrackFormerResearch
+python -m pip install --upgrade pip
+pip install -U pip setuptools wheel
+
+REM comment out lap, numpy and Cython in the requirements.py
+pip install numpy==1.21.6 Cython==0.29.20
+pip install lap==0.4.0
+pip install --no-deps -r requirements.txt
+
+# torch==1.5.0, torchvision==0.6.0 for cuda 9.2
+pip install torch==1.5.0+cu101 torchvision==0.6.0+cu101 -f https://download.pytorch.org/whl/torch_stable.html
