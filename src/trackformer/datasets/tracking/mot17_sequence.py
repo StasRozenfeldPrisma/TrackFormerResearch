@@ -24,9 +24,11 @@ class MOT17Sequence(Dataset):
     This dataloader is designed so that it can handle only one sequence,
     if more have to be handled one should inherit from this class.
     """
-    data_folder = 'MOT17'
+    data_folder = 'mot17'  # 'MOT17'
 
-    def __init__(self, root_dir: str = 'data', seq_name: Optional[str] = None,
+    def __init__(self,
+                 root_dir: str = 'data',
+                 seq_name: Optional[str] = None,
                  dets: str = '', vis_threshold: float = 0.0, img_transform: Namespace = None) -> None:
         """
         Args:

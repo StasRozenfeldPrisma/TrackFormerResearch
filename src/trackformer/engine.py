@@ -7,7 +7,8 @@ import math
 import os
 import sys
 from typing import Iterable
-
+import time
+import numpy as np
 import torch
 from track import ex
 
@@ -116,7 +117,23 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module, postproc
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
     metric_logger.add_meter('class_error', utils.SmoothedValue(window_size=1, fmt='{value:.2f}'))
 
+
+    dt_upload = []
+    dt_model_est = []
+    dt_losses = []
+    dt_grad = []
+    dt_rest = []
+    dt_vis = []
+
+
+    t_prev = time.time()
     for i, (samples, targets) in enumerate(metric_logger.log_every(data_loader, epoch)):
+        dt_upload.append(time.time() - t_prev)
+        t_prev = time.time()
+        if False:
+            from src.trackformer.vis_stas import visualize_batch
+            visualize_batch(samples, targets, i * 10 + 10000)
+
         samples = samples.to(device)
         targets = [utils.nested_dict_to_device(t, device) for t in targets]
 
@@ -124,6 +141,9 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module, postproc
         # to pass it through as torch.nn.parallel.DistributedDataParallel only
         # passes copies
         outputs, targets, *_ = model(samples, targets)
+
+        dt_model_est.append(time.time() - t_prev)
+        t_prev = time.time()
 
         loss_dict = criterion(outputs, targets)
         weight_dict = criterion.weight_dict
@@ -144,11 +164,17 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module, postproc
             print(loss_dict_reduced)
             sys.exit(1)
 
+        dt_losses.append(time.time() - t_prev)
+        t_prev = time.time()
+
         optimizer.zero_grad()
         losses.backward()
         if args.clip_max_norm > 0:
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip_max_norm)
         optimizer.step()
+
+        dt_grad.append(time.time() - t_prev)
+        t_prev = time.time()
 
         metric_logger.update(loss=loss_value,
                              **loss_dict_reduced_scaled,
@@ -156,6 +182,9 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module, postproc
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
         metric_logger.update(lr=optimizer.param_groups[0]["lr"],
                              lr_backbone=optimizer.param_groups[1]["lr"])
+
+        dt_rest.append(time.time() - t_prev)
+        t_prev = time.time()
 
         if visualizers and (i == 0 or not i % args.vis_and_log_interval):
             _, results = make_results(
@@ -167,6 +196,15 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module, postproc
                 results[0],
                 targets[0],
                 args.tracking)
+
+        dt_vis.append(time.time() - t_prev)
+        if not i % args.vis_and_log_interval:
+            pass
+            # print('dt_upload, dt_model_est, dt_losses, dt_grad, dt_rest, dt_vis')
+            # print(f'{sum(dt_upload[20:])}, {sum(dt_model_est[20:])}, {sum(dt_losses[20:])}, {sum(dt_grad[20:])}, {sum(dt_rest[20:])}, {sum(dt_vis[20:])}')
+
+        t_prev = time.time()
+        q = 1
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()

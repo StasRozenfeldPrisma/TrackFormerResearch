@@ -11,7 +11,7 @@ import subprocess
 import time
 from argparse import Namespace
 from collections import defaultdict, deque
-from typing import List, Optional
+from typing import List, Optional, Tuple, Union
 
 import torch
 import torch.distributed as dist
@@ -586,3 +586,37 @@ def nested_dict_to_device(dictionary, device):
             output[key] = nested_dict_to_device(value, device)
         return output
     return dictionary.to(device)
+
+
+def nested_tuple_of_limited_len_to_device(tuple_instance: Union[Tuple, torch.Tensor],
+                                            device) -> Union[Tuple, torch.Tensor]:
+    if isinstance(tuple_instance, torch.Tensor):
+        return tuple_instance.to(device)
+
+    if len(tuple_instance) == 0:
+        return tuple_instance
+    elif len(tuple_instance) == 1:
+        return (nested_tuple_of_limited_len_to_device(tuple_instance[0], device))
+    elif len(tuple_instance) == 2:
+        return (nested_tuple_of_limited_len_to_device(tuple_instance[0], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[1], device))
+    elif len(tuple_instance) == 3:
+        return (nested_tuple_of_limited_len_to_device(tuple_instance[0], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[1], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[2], device),)
+    elif len(tuple_instance) == 4:
+        return (nested_tuple_of_limited_len_to_device(tuple_instance[0], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[1], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[2], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[3], device),)
+    elif len(tuple_instance) == 5:
+        return (nested_tuple_of_limited_len_to_device(tuple_instance[0], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[1], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[2], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[3], device),
+                nested_tuple_of_limited_len_to_device(tuple_instance[4], device),)
+    if len(tuple_instance) > 5:
+        raise "nested_tuple_of_limited_len_to_device: too long tuple"
+
+
+

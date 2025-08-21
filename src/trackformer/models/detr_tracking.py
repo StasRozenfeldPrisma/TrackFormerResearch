@@ -11,6 +11,8 @@ from .deformable_detr import DeformableDETR
 from .detr import DETR
 from .matcher import HungarianMatcher
 
+from src.trackformer.util.misc import nested_tuple_of_limited_len_to_device
+
 
 class DETRTrackingBase(nn.Module):
 
@@ -257,8 +259,11 @@ class DETRTrackingBase(nn.Module):
                     prev_outputs_without_aux = {
                         k: v for k, v in prev_out.items() if 'aux_outputs' not in k}
                     prev_indices = self._matcher(prev_outputs_without_aux, prev_targets)
-
-                    self.add_track_queries_to_targets(targets, prev_indices, prev_out)
+                    # from src.trackformer.util.misc import nested_tuple_of_limited_len_to_device
+                    prev_indices_gpu = [nested_tuple_of_limited_len_to_device(t, prev_outputs_without_aux['pred_boxes'].device) for t in prev_indices]
+                    #from .util import misc as utils
+                    #targets = [utils.nested_dict_to_device(t, device) for t in targets]
+                    self.add_track_queries_to_targets(targets, prev_indices_gpu, prev_out)
             else:
                 # if not training we do not add track queries and evaluate detection performance only.
                 # tracking performance is evaluated by the actual tracking evaluation.

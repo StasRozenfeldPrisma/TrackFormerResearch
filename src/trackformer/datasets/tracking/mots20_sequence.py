@@ -22,7 +22,9 @@ class MOTS20Sequence(MOT17Sequence):
     """
     data_folder = 'MOTS20'
 
-    def __init__(self, root_dir: str = 'data', seq_name: Optional[str] = None,
+    def __init__(self,
+                 root_dir: str = r'D:\data\__research_only',  # 'data',
+                 seq_name: Optional[str] = None,
                  vis_threshold: float = 0.0, img_transform: Namespace = None) -> None:
         """
         Args:

@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import datetime
-import os
+import os, platform
 import random
 import time
 from argparse import Namespace
@@ -21,18 +21,21 @@ from trackformer.util.plot_utils import get_vis_win_names
 from trackformer.vis import build_visualizers
 
 ex = sacred.Experiment('train')
-ex.add_config('cfgs/train.yaml')
-ex.add_named_config('deformable', 'cfgs/train_deformable.yaml')
-ex.add_named_config('tracking', 'cfgs/train_tracking.yaml')
-ex.add_named_config('crowdhuman', 'cfgs/train_crowdhuman.yaml')
-ex.add_named_config('mot_coco_person', 'cfgs/train_mot_coco_person.yaml')
-ex.add_named_config('mot17_crowdhuman', 'cfgs/train_mot17_crowdhuman.yaml')
-ex.add_named_config('mot17', 'cfgs/train_mot17.yaml')
-ex.add_named_config('mots20', 'cfgs/train_mots20.yaml')
-ex.add_named_config('mot20_crowdhuman', 'cfgs/train_mot20_crowdhuman.yaml')
-ex.add_named_config('coco_person_masks', 'cfgs/train_coco_person_masks.yaml')
-ex.add_named_config('full_res', 'cfgs/train_full_res.yaml')
-ex.add_named_config('multi_frame', 'cfgs/train_multi_frame.yaml')
+
+cfgs_path =  os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'cfgs')
+
+ex.add_config(os.path.join(cfgs_path, 'train.yaml'))  # ex.add_config('cfgs/train.yaml')
+ex.add_named_config('deformable', os.path.join(cfgs_path, 'train_deformable.yaml'))  # 'cfgs/train_deformable.yaml')
+ex.add_named_config('tracking', os.path.join(cfgs_path, 'train_tracking.yaml'))  #  'cfgs/train_tracking.yaml')
+ex.add_named_config('crowdhuman', os.path.join(cfgs_path, 'train_crowdhuman.yaml'))  #  'cfgs/train_crowdhuman.yaml')
+ex.add_named_config('mot_coco_person', os.path.join(cfgs_path, 'train_mot_coco_person.yaml'))  #  'cfgs/train_mot_coco_person.yaml')
+ex.add_named_config('mot17_crowdhuman', os.path.join(cfgs_path, 'train_mot17_crowdhuman.yaml'))  #  'cfgs/train_mot17_crowdhuman.yaml')
+ex.add_named_config('mot17',  os.path.join(cfgs_path, 'train_mot17.yaml'))  # 'cfgs/train_mot17_crowdhuman.yaml')
+ex.add_named_config('mots20',  os.path.join(cfgs_path, 'train_mots20.yaml'))  # 'cfgs/train_mots20.yaml')
+ex.add_named_config('mot20_crowdhuman', os.path.join(cfgs_path, 'train_mot20_crowdhuman.yaml'))  #  'cfgs/train_mot20_crowdhuman.yaml')
+ex.add_named_config('coco_person_masks', os.path.join(cfgs_path, 'train_coco_person_masks.yaml'))  # , 'cfgs/train_coco_person_masks.yaml')
+ex.add_named_config('full_res', os.path.join(cfgs_path, 'train_full_res.yaml'))  #  'cfgs/train_full_res.yaml')
+ex.add_named_config('multi_frame', os.path.join(cfgs_path, 'train_multi_frame.yaml'))  #  'cfgs/train_multi_frame.yaml')
 
 
 def train(args: Namespace) -> None:
@@ -295,7 +298,7 @@ def train(args: Namespace) -> None:
         checkpoint_paths = [output_dir / 'checkpoint.pth']
 
         # VAL
-        if epoch == 1 or not epoch % args.val_interval:
+        if epoch == 1 or epoch == 3 or not epoch % args.val_interval:
             val_stats, _ = evaluate(
                 model, criterion, postprocessors, data_loader_val, device,
                 output_dir, visualizers['val'], args, epoch)
@@ -323,7 +326,7 @@ def train(args: Namespace) -> None:
 
         # MODEL SAVING
         if args.output_dir:
-            if args.save_model_interval and not epoch % args.save_model_interval:
+            if epoch == 1 or epoch == 3  or (args.save_model_interval and not epoch % args.save_model_interval):
                 checkpoint_paths.append(output_dir / f"checkpoint_epoch_{epoch}.pth")
 
             for checkpoint_path in checkpoint_paths:
@@ -349,8 +352,22 @@ def load_config(_config, _run):
 
 
 if __name__ == '__main__':
+    # example for parameters
+    # with mot17 deformable multi_frame tracking output_dir=D:\data\__research_only\track_former_models_on_mot17
     # TODO: hierachical Namespacing for nested dict
-    config = ex.run_commandline().config
+    if platform.system() == "Windows":
+        run = ex.run_commandline()
+        config = run.config
+    elif platform.system() == "Linux":
+        config = ex.run_commandline().config
+    else:
+        raise "Unknown platform."
+    print("11")
     args = nested_dict_to_namespace(config)
+    print("12")
     # args.train = Namespace(**config['train'])
+    if platform.system() == "Windows":
+        args.num_workers = 0
+
+    # args.track_prev_prev_frame = True
     train(args)

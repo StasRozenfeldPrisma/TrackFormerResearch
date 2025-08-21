@@ -292,6 +292,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate COCO from MOT.')
     parser.add_argument('--mots20', action='store_true')
     parser.add_argument('--mot20', action='store_true')
+    parser.add_argument('--data_root_param', type=str, default="")
     args = parser.parse_args()
 
     mot15_seqs_names = list(MOT_15_SEQS_INFO.keys())
@@ -320,7 +321,10 @@ if __name__ == '__main__':
                 seqs_names=val_seqs, mots=True)
 
     elif args.mot20:
-        data_root = 'data/MOT20'
+        if args.data_root_param:
+            data_root = args.data_root_param
+        else:
+            data_root = 'data/MOT20'
         train_seqs = ['MOT20-01', 'MOT20-02', 'MOT20-03', 'MOT20-05',]
         # TRAIN SET
         generate_coco_from_mot(
@@ -357,55 +361,83 @@ if __name__ == '__main__':
         #
         # MOT17
         #
-
+        if args.data_root_param:
+            data_root = args.data_root_param
+        else:
+            data_root = r"D:\data\__research_only\mot17"
         # CROSS VAL SPLIT 1
         generate_coco_from_mot(
             'mot17_train_cross_val_1_coco',
-            seqs_names=['MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-11-FRCNN'])
+            seqs_names=['MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-11-FRCNN'],
+            data_root=data_root)
         generate_coco_from_mot(
             'mot17_val_cross_val_1_coco',
-            seqs_names=['MOT17-02-FRCNN', 'MOT17-10-FRCNN', 'MOT17-13-FRCNN'])
+            seqs_names=['MOT17-02-FRCNN', 'MOT17-10-FRCNN', 'MOT17-13-FRCNN'],
+            data_root=data_root)
 
         # CROSS VAL SPLIT 2
         generate_coco_from_mot(
             'mot17_train_cross_val_2_coco',
-            seqs_names=['MOT17-02-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-10-FRCNN', 'MOT17-13-FRCNN'])
+            seqs_names=['MOT17-02-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-10-FRCNN', 'MOT17-13-FRCNN'],
+            data_root=data_root)
         generate_coco_from_mot(
             'mot17_val_cross_val_2_coco',
-            seqs_names=['MOT17-04-FRCNN', 'MOT17-11-FRCNN'])
+            seqs_names=['MOT17-04-FRCNN', 'MOT17-11-FRCNN'],
+            data_root=data_root)
 
         # CROSS VAL SPLIT 3
         generate_coco_from_mot(
             'mot17_train_cross_val_3_coco',
-            seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'])
+            seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'],
+            data_root=data_root)
         generate_coco_from_mot(
             'mot17_val_cross_val_3_coco',
-            seqs_names=['MOT17-05-FRCNN', 'MOT17-09-FRCNN'])
+            seqs_names=['MOT17-05-FRCNN', 'MOT17-09-FRCNN'],
+            data_root=data_root)
 
         # CROSS VAL FRAME SPLIT
         generate_coco_from_mot(
             'mot17_train_cross_val_frame_0_0_to_0_25_coco',
             seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'],
-            frame_range={'start': 0, 'end': 0.25})
+            frame_range={'start': 0, 'end': 0.25},
+            data_root=data_root)
         generate_coco_from_mot(
             'mot17_train_cross_val_frame_0_0_to_0_5_coco',
             seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'],
-            frame_range={'start': 0, 'end': 0.5})
+            frame_range={'start': 0, 'end': 0.5},
+            data_root=data_root)
         generate_coco_from_mot(
             'mot17_train_cross_val_frame_0_5_to_1_0_coco',
             seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'],
-            frame_range={'start': 0.5, 'end': 1.0})
+            frame_range={'start': 0.5, 'end': 1.0},
+            data_root=data_root)
+
+        generate_coco_from_mot(
+            'mot17_train_cross_val_frame_0_5_to_0_51_coco__dev',
+            seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-10-FRCNN',
+                        'MOT17-11-FRCNN', 'MOT17-13-FRCNN'],
+            frame_range={'start': 0.5, 'end': 0.51},
+            data_root=data_root)
 
         generate_coco_from_mot(
             'mot17_train_cross_val_frame_0_75_to_1_0_coco',
             seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN', 'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'],
-            frame_range={'start': 0.75, 'end': 1.0})
+            frame_range={'start': 0.75, 'end': 1.0},
+            data_root=data_root)
 
         # TRAIN SET
         generate_coco_from_mot(
             'mot17_train_coco',
             seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN',
-                        'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'])
+                        'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'],
+            data_root=data_root)
+
+        generate_coco_from_mot(
+            'mot17_train_coco_dev_one_percent',
+            seqs_names=['MOT17-02-FRCNN', 'MOT17-04-FRCNN', 'MOT17-05-FRCNN', 'MOT17-09-FRCNN',
+                        'MOT17-10-FRCNN', 'MOT17-11-FRCNN', 'MOT17-13-FRCNN'],
+            frame_range={'start': 0.95, 'end': 0.96},
+            data_root=data_root)
 
         for i in range(0, 7):
             train_seqs = [
@@ -415,7 +447,9 @@ if __name__ == '__main__':
 
             generate_coco_from_mot(
                 f'mot17_train_{i + 1}_coco',
-                seqs_names=train_seqs)
+                seqs_names=train_seqs,
+                data_root=data_root)
             generate_coco_from_mot(
                 f'mot17_val_{i + 1}_coco',
-                seqs_names=val_seqs)
+                seqs_names=val_seqs,
+                data_root=data_root)
