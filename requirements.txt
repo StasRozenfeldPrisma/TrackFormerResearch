@@ -88,7 +88,7 @@ pytest==7.2.1 # pytest==5.4.3
 pytest-benchmark==3.2.3
 python-dateutil==2.8.1
 pytz==2020.1
-PyWavelets==1.1.1
+PyWavelets==1.4.1
 pyyaml==6.0.2 # PyYAML==5.3.1
 pyzmq==27.0.1 # pyzmq==19.0.1
 qtconsole==5.0.2
