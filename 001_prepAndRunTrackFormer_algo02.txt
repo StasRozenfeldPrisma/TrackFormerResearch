@@ -1,0 +1,118 @@
+run trackFormer on Algo02
+0) Make sure that we have VS 2019 community installed
+1) create J:\stas\_data and J:\stas\_running_stand_alone_MOT
+2) install python3.10, cuda 11.6, cudnn 8.5.0.96
+   python3.10: Use install now  (to C:\Users\algo02\AppData\Local\Programs\Python\Python310)
+               Note: On my pc I used Custom installation -> install for all users (to C:\Program Files\Python310) but
+			         on Algo02 I prefered to install python 3.10 to the same location as python 3.8
+   After installing Cuda 11.6 make sure that Cuda 11.3 is still a defaul:
+        environment variable 'CUDA_PATH': C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.3
+
+        envronment variable 'path':	
+				C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.3\bin
+				C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.3\libnvvp
+				are above other rows that contain CUDA\v...
+3) Install virtual envirnment
+
+REM: prep - get ripo:
+REM: start cmd NOT administrator
+J:
+cd stas
+mkdir GIT_ripos
+cd GIT_ripos
+git clone https://github.com/StasRozenfeldPrisma/TrackFormerResearch.git
+
+
+
+REM cmd -> run as administrator
+C:
+cd C:\Users\algo02\virtualenvs
+mkdir p3_10_trackFormerResearch
+cd p3_10_trackFormerResearch
+"C:\Users\algo02\AppData\Local\Programs\Python\Python310\python.exe" -m venv C:\Users\algo02\virtualenvs\p3_10_trackFormerResearch
+Scripts\activate
+
+J:
+cd J:\stas\GIT_ripos\TrackFormerResearch
+
+python -m pip install --upgrade pip
+pip install -U pip setuptools wheel
+
+doskey nvcc="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\bin\nvcc.exe" $*
+call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+pip install -U pip "packaging>=23.2" setuptools wheel  
+REM The above provided packaging-25.0
+
+pip install --no-deps -r requirements.txt
+pip install pycocotools==2.0.10
+
+pip install fonttools==4.22.0 setuptools-scm==4.0.0 lazy_loader==0.3 tomli==1.0.0 exceptiongroup==1.0.0 iniconfig==1.1.1
+
+python -m pip install -U pip wheel "setuptools>=70" "packaging>=24.1" "setuptools_scm>=8"
+REM: ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+REM: sacred 0.8.7 requires docopt-ng<1.0,>=0.9, which is not installed.
+REM: sacred 0.8.7 requires jsonpickle>=2.2.0, but you have jsonpickle 1.4.1 which is incompatible.
+REM: Successfully installed packaging-25.0 setuptools_scm-9.2.0
+
+pip install  jsonpickle==2.2.0
+pip install docopt-ng==0.9
+
+
+pip install --no-cache-dir git+https://github.com/cocodataset/panopticapi.git
+
+pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116
+
+pip install protobuf==3.20.1
+
+pip install onnxruntime-gpu==1.13.1 --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-11/pypi/simple/
+pip install onnx==1.12
+
+
+REM go to start menu and run "x64 Native Tools Command Prompt for VS" (it runs vcvars64.bat)
+
+REM: already done: doskey nvcc="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\bin\nvcc.exe" $*
+REM: already done: call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+set TORCH_CUDA_ARCH_LIST=8.6
+set DISTUTILS_USE_SDK=1
+
+
+python src/trackformer/models/ops/setup.py build --build-base=src/trackformer/models/ops/ install
+
+REM: Done with a C:LOT of warnings for building  MultiScaleDeformableAttention
+pip install PyQt5==5.15.7
+
+REM: in C:\Users\algo02\virtualenvs\p3_10_trackFormerResearch\Lib\site-packages\motmetrics\mot.py
+REM: lines 178, 180 replace np.bool with bool				
+
+REM in C:\Users\algo02\virtualenvs\p3_10_trackFormerResearch\Lib\site-packages\motmetrics\distances.py
+REM line 79 replace "dtype=np.float" with  "dtype=float"
+
+4) put data locally
+    - copy "\\prisma-server1\data\temp\stas\_data__research_only\mot17\MOT17.zip" -> "J:\stas\_data__research_only\MOT17.zip" and do "extract here" with 7-zip.
+	  It will create J:\stas\_data__research_only\MOT17\ with subdirectories \test and \train
+	- copy content of \\prisma-server1\data\temp\stas\_data__research_only\coco17 into J:\stas\_data__research_only\coco17
+	
+5) Open J:\stas\GIT_ripos\TrackFormerResearch in pycharm.
+   Use interpreter "C:\Users\algo02\virtualenvs\p3_10_trackFormerResearch\Scripts\python.exe" 	
+
+   create J:\stas\_data__research_only\track_former_models_on_mot17
+   
+   set up run-parameters of J:\stas\GIT_ripos\TrackFormerResearch\src\train.py  to 
+   "with mot17 deformable multi_frame tracking output_dir=J:\stas\_data__research_only\track_former_models_on_mot17"   
+   
+   go to J:\stas\GIT_ripos\TrackFormerResearch\src\generate_coco_from_mot.py line 367
+   make it 
+   data_root = r"J:\stas\_data__research_only\MOT17"
+   
+   In J:\stas\GIT_ripos\TrackFormerResearch\cfgs\track.yaml:
+   data_root_dir: J:\stas\_data__research_only 
+   
+   J:\stas\GIT_ripos\TrackFormerResearch\cfgs\train.yaml
+   coco_path: J:\stas\_data__research_only\coco17  # data/coco_2017
+   coco_panoptic_path: null
+   mot_path_train: J:\stas\_data__research_only\mot17  # data/MOT17
+   mot_path_val: J:\stas\_data__research_only\mot17  # data/MOT17
+   
+   J:\stas\GIT_ripos\TrackFormerResearch\cfgs\train_mot17.yaml
+   mot_path_train: J:\stas\_data__research_only\mot17 #  data/MOT17
+   mot_path_val: J:\stas\_data__research_only\mot17 # data/MOT17

@@ -69,6 +69,9 @@ pip install PyQt5==5.15.7
 
 REM: in C:\Users\stas.rozenfeld\virtualenvs\p3_10_trackFormerResearch\Lib\site-packages\motmetrics\mot.py
 REM: lines 178, 180 replace np.bool with bool
+
+REM in C:\Users\stas.rozenfeld\virtualenvs\p3_10_trackFormerResearch\Lib\site-packages\motmetrics\distances.py
+REM line 79 replace "dtype=np.float" with  "dtype=float"
 ---------------------
 -----------------------------
 windows 10

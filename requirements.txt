@@ -33,7 +33,7 @@ isort==5.6.4
 jedi==0.18.0
 Jinja2==2.11.2
 jsonpatch==1.25
-jsonpickle==1.4.1
+jsonpickle==2.2.0 # 1.4.1 #
 jsonpointer==2.0
 jsonschema==3.2.0
 jupyter==1.0.0
