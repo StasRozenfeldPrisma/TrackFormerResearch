@@ -11,7 +11,7 @@ from .deformable_detr import DeformableDETR
 from .detr import DETR
 from .matcher import HungarianMatcher
 
-from src.trackformer.util.misc import nested_tuple_of_limited_len_to_device
+from ..util.misc import nested_tuple_of_limited_len_to_device
 
 
 class DETRTrackingBase(nn.Module):

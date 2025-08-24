@@ -1,0 +1,127 @@
+We run on puzuntu01
+0) Install python 3.10 
+apt-cache search '^python3\.10($|-)'
+sudo apt update
+sudo apt install -y python3.10 python3.10-venv python3.10-dev  # if found
+
+python3.10 -V
+
+python3.10 -m venv ~/virtualenvs/p3_10_trackFormerResearch
+
+
+1) set up vrtual env: python 3.10 cuda 11.6 CuDnn 8.2.4 
+cd ~
+mkdir GIT_ripos
+cd GIT_ripos
+git clone https://github.com/StasRozenfeldPrisma/TrackFormerResearch.git
+cd TrackFormerResearch
+
+source ~/virtualenvs/p3_10_trackFormerResearch/bin/activate
+python -m pip install --upgrade pip
+pip install -U pip setuptools wheel
+
+pip install --no-deps -r requirements.txt
+pip install pycocotools==2.0.10
+pip install fonttools==4.22.0 setuptools-scm==4.0.0 lazy_loader==0.3 tomli==1.0.0 exceptiongroup==1.0.0 iniconfig==1.1.1
+python -m pip install -U pip wheel "setuptools>=70" "packaging>=24.1" "setuptools_scm>=8"
+pip install docopt-ng==0.9
+ 
+ 
+REM: cuda 11.6 
+# -- Make sure apt is healthy (you already fixed the Atom/Chrome issues)
+sudo apt update
+# make sure that nvidia is there in the resuting list. If not - consult GPT hw to add it
+
+sudo apt install -y cuda-toolkit-11-6
+
+
+# -- If the NVIDIA CUDA repo is not present, add it (Ubuntu 20.04):
+#    (You can skip this if you already see this URL in apt output:
+#     developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64)
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub | sudo gpg --dearmor -o /etc/apt/keyrings/cuda-archive-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/cuda-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" | sudo tee /etc/apt/sources.list.d/cuda-ubuntu2004.list >/dev/null
+
+sudo apt update
+
+echo 'export PATH=/usr/local/cuda-11.6/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda-11.6/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}' >> ~/.bashrc
+source ~/.bashrc
+
+nvcc --version     # should say release 11.6
+nvidia-smi 
+
+
+sudo apt install -y nvidia-driver-510
+sudo update-alternatives --install /usr/local/cuda cuda /usr/local/cuda-11.6 1160
+sudo update-alternatives --config cuda  # choose appropriate cuda from the proposed list
+
+REM onnx-runtime-gpu & onnx
+pip install onnxruntime-gpu==1.13.1 --extra-index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-11/pypi/simple/
+pip install onnx==1.12
+
+
+
+cd GIT_ripos/TrackFormerResearch
+pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116
+python src/trackformer/models/ops/setup.py build --build-base=src/trackformer/models/ops/ install
+
+
+REM: in ~/virtualenvs/p3_10_trackFormerResearch/lib64/python3.10/site-packages/pycocotools/mot.py
+REM: lines 178, 180 replace np.bool with bool				
+
+REM in ~/virtualenvs/p3_10_trackFormerResearch/lib64/python3.10/site-packages/motmetrics/distances.py
+REM line 79 replace "dtype=np.float" with  "dtype=float"
+
+REM in ~/virtualenvs/p3_10_trackFormerResearch/lib64/python3.10/site-packages/pycocotools/coco.py
+REM line 314. replace res.dataset['info'] = copy.deepcopy(self.dataset['info']) with:
+REM if 'info' in self.dataset:
+REM     res.dataset['info'] = copy.deepcopy(self.dataset['info'])
+
+REM put in data
+cd ~/data
+mkdir _data__research_only
+cd ~/data/_data__research_only
+cp /mnt/prisma-server1/temp/stas/_data__research_only/mot17/MOT17.zip .
+mkdir coco17
+cd coco17
+cp /mnt/prisma-server1/temp/stas/_data__research_only/coco17/*.zip .
+
+# install 7-zip
+sudo apt update
+sudo apt install -y p7zip-full p7zip-rar
+cd ~/data/_data__research_only
+7z x MOT17.zip 
+
+
+
+REM prepare data in format necessary for trackFormer
+REM go to ~/GIT_ripos/TrackFormerResearch/src/generate_coco_from_mot.py line 367
+REM    make it 
+REM   data_root = '~/data/_data__research_only/MOT17/'
+
+REM choose ~/virtualenvs/p3_10_trackFormerResearch/bin/python as interpreter
+
+mkdir track_former_models_on_mot17
+
+REM set up run-parameters for running code
+cd home/stasr/data/_data__research_only/MOT17
+python src\generate_coco_from_mot.py
+
+	
+	In ~/GIT_ripos/TrackFormerResearch/cfgs/track.yaml:
+    data_root_dir: /home/stasr/data/_data__research_only 
+   
+    ~/GIT_ripos/TrackFormerResearch/cfgs/train.yaml
+    coco_path: /home/stasr/data/_data__research_only/coco17  # data/coco_2017
+    coco_panoptic_path: null
+    mot_path_train: /home/stasr/data/_data__research_only/MOT17  # data/MOT17
+    mot_path_val: /home/stasr/data/_data__research_only/MOT17  # data/MOT17
+   
+    ~/GIT_ripos/TrackFormerResearch/cfgs/train_mot17.yaml
+    mot_path_train: /home/stasr/data/_data__research_only/MOT17 #  data/MOT17
+    mot_path_val: /home/stasr/data/_data__research_only/MOT17 # data/MOT17
+	
+	in /home/stasr/GIT_ripos/TrackFormerResearch/src/trackformer/datasets/tracking/mot17_sequence.py
+	line 27 change 'mot17' to 'MOT17'
+	

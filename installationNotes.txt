@@ -72,6 +72,12 @@ REM: lines 178, 180 replace np.bool with bool
 
 REM in C:\Users\stas.rozenfeld\virtualenvs\p3_10_trackFormerResearch\Lib\site-packages\motmetrics\distances.py
 REM line 79 replace "dtype=np.float" with  "dtype=float"
+
+REM in C:\Users\stas.rozenfeld\virtualenvs\p3_10_trackFormerResearch\Lib\site-packages\pycocotools\coco.py
+REM line 314. replace res.dataset['info'] = copy.deepcopy(self.dataset['info']) with:
+REM if 'info' in self.dataset:
+REM     res.dataset['info'] = copy.deepcopy(self.dataset['info'])
+
 ---------------------
 -----------------------------
 windows 10
