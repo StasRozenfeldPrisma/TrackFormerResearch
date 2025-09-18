@@ -359,7 +359,8 @@ if __name__ == '__main__':
         run = ex.run_commandline()
         config = run.config
     elif platform.system() == "Linux":
-        config = ex.run_commandline().config
+        run = ex.run_commandline()
+        config = run.config
     else:
         raise "Unknown platform."
     print("11")
@@ -369,5 +370,6 @@ if __name__ == '__main__':
     if platform.system() == "Windows":
         args.num_workers = 0
 
-    # args.track_prev_prev_frame = True
+    args.track_prev_prev_frame = True
+    args.track_backprop_prev_frame = True
     train(args)

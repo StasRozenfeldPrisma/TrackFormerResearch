@@ -26,16 +26,25 @@ python D:\GIT_ripos\TrackFormerResearch\models\ops\setup.py build --build-base=D
 REM -----------------------------------
 REM Windows 10 --  !!!!! --------
 REM Using python 3.10 (to be able to add installation of detr)
-REM cmd -> run as administrator
 
+
+REM cmd (not as Administrator)
+D:
+cd D:\GIT_ripos
+git clone https://github.com/StasRozenfeldPrisma/TrackFormerResearch.git
+
+
+REM cmd -> run as administrator
 C:
+cd C:\Users\stas.rozenfeld\virtualenvs\
+mkdir p3_10_trackFormerResearch
 cd C:\Users\stas.rozenfeld\virtualenvs\p3_10_trackFormerResearch
 "C:\Program Files\Python310\python.exe" -m venv C:\Users\stas.rozenfeld\virtualenvs\p3_10_trackFormerResearch
 Scripts\activate
 D:
 cd D:\GIT_ripos\TrackFormerResearch
 python -m pip install --upgrade pip
-pip install -U pip setuptools wheel
+pip install -U pip setuptools wheel # Successfully installed setuptools-80.9.0 wheel-0.45.1
 
 
 pip install --no-deps -r requirements.txt
@@ -43,7 +52,7 @@ pip install pycocotools==2.0.10
 
 pip install fonttools==4.22.0 setuptools-scm==4.0.0 lazy_loader==0.3 tomli==1.0.0 exceptiongroup==1.0.0 iniconfig==1.1.1
 
-pip install -U pip "packaging>=23.2" setuptools wheel
+pip install -U pip "packaging>=23.2" setuptools wheel  # Successfully installed packaging-25.0
 pip install --no-cache-dir git+https://github.com/cocodataset/panopticapi.git
 
 pip install torch==1.13.1+cu116 torchvision==0.14.1+cu116 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu116
@@ -64,7 +73,7 @@ set DISTUTILS_USE_SDK=1
 
 python src/trackformer/models/ops/setup.py build --build-base=src/trackformer/models/ops/ install
 
-REM: Done with a C:LOT of warnings for building  MultiScaleDeformableAttention
+REM: Done with a  LOT of warnings for building  MultiScaleDeformableAttention
 pip install PyQt5==5.15.7
 
 REM: in C:\Users\stas.rozenfeld\virtualenvs\p3_10_trackFormerResearch\Lib\site-packages\motmetrics\mot.py

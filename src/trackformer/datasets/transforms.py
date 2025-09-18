@@ -19,6 +19,8 @@ def crop(image, target, region, overflow_boxes=False):
     target = target.copy()
 
     if isinstance(image, torch.Tensor):
+        # TODO: I think here we have a bug - in tensor wwe have Chan X High X Width, Therefore, it seems that the correct way should be
+        #       cropped_image = image[:, i:i + h, j:j + w]
         cropped_image = image[:, j:j + w, i:i + h]
     else:
         cropped_image = F.crop(image, *region)

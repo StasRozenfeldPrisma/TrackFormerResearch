@@ -130,7 +130,44 @@ def main(seed, dataset_name, obj_detect_checkpoint_file, tracker_cfg,
             for frame_id, frame_data in enumerate(tqdm.tqdm(seq_loader, file=sys.stdout)):
                 with torch.no_grad():
                     tracker.step(frame_data)
+                    if False:
+                        import cv2
+                        import matplotlib
+                        matplotlib.use('Qt5Agg')
+                        import matplotlib.pyplot as plt
+                        results_now = tracker.get_results()
+                        img = np.transpose(frame_data['img'].numpy()[0], [1, 2, 0])
+                        img = img - np.min(img)
+                        img = img / np.max(img)
+                        det_input = frame_data['dets'].numpy()[0]
+                        dets_tracker = []
+                        for kk in results_now:
+                            if frame_id in results_now[kk]:
+                                dets_tracker.append(results_now[kk][frame_id])
+                        dets_tracker_stack = np.stack([el['bbox'] for el in dets_tracker])
+                        sz = frame_data['orig_size'].numpy()[0]
+                        img_full_size = cv2.resize(img, (sz[1], sz[0]))
+                        plt.figure(23)
+                        plt.subplot(1, 2, 1)
+                        plt.imshow(img_full_size)
+                        for box in det_input:
+                            plt.gca().add_patch(plt.Rectangle((box[0], box[1]), box[2] - box[0], box[3] - box[1],
+                                                              fill=False,
+                                                              edgecolor='cyan',  # Contour color (black)
+                                                              linewidth=2,  # Thickness of contour
+                                                              label=f"Rect {0}"))
 
+                        plt.subplot(1, 2, 2)
+                        plt.imshow(img_full_size)
+                        for box in dets_tracker_stack:
+                            plt.gca().add_patch(plt.Rectangle((box[0], box[1]), box[2] - box[0], box[3] - box[1],
+                                                              fill=False,
+                                                              edgecolor='cyan',  # Contour color (black)
+                                                              linewidth=2,  # Thickness of contour
+                                                              label=f"Rect {0}"))
+
+
+                    q = 1
             results = tracker.get_results()
 
             time_total += time.time() - start
