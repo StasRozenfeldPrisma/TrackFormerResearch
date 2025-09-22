@@ -13,8 +13,9 @@ import yaml
 from torch.utils.data import DataLoader, DistributedSampler
 
 import trackformer.util.misc as utils
+
 from trackformer.datasets import build_dataset
-from trackformer.engine import evaluate, train_one_epoch
+from trackformer.engine import evaluate, train_one_epoch, evaluate_simple
 from trackformer.models import build_model
 from trackformer.util.misc import nested_dict_to_namespace
 from trackformer.util.plot_utils import get_vis_win_names
