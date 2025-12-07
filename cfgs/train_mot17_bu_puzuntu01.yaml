@@ -1,0 +1,12 @@
+dataset: mot
+
+train_split: mot17_train_coco  # mot17_train_coco_dev_one_percent  #  mot17_train_coco  # 
+val_split: mot17_train_cross_val_frame_0_5_to_1_0_coco  # mot17_train_cross_val_frame_0_5_to_0_51_coco__dev  #
+
+mot_path_train: /home/stasr/data/_data__research_only/MOT17 #  data/MOT17
+mot_path_val: /home/stasr/data/_data__research_only/MOT17 # data/MOT17
+
+resume: '' # models/r50_deformable_detr_plus_iterative_bbox_refinement-checkpoint_hidden_dim_288.pth
+
+epochs: 50
+lr_drop: 10

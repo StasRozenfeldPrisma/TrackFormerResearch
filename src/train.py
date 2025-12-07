@@ -373,4 +373,9 @@ if __name__ == '__main__':
 
     args.track_prev_prev_frame = True
     args.track_backprop_prev_frame = True
+
+    ## !!
+    # args.two_stage = True
+    # args.with_box_refine = False
+    ## !!
     train(args)
