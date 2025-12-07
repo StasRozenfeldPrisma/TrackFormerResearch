@@ -365,6 +365,8 @@ if __name__ == '__main__':
             data_root = args.data_root_param
         else:
             data_root = r"D:\data\__research_only\mot17"
+            if not os.path.isdir(data_root):
+                data_root = '/home/stasr/data/_data__research_only/MOT17/'
         # CROSS VAL SPLIT 1
         generate_coco_from_mot(
             'mot17_train_cross_val_1_coco',
